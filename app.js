@@ -25,24 +25,21 @@ var allowCrossDomain = function(req, res, next) {
 app.use(morgan('dev'));
 app.use(allowCrossDomain);
 
-var clientId = 'b52dc91988324fd697d1f2db77378d46',
-    clientSecret = process.env.SPOTIFY_SECRET;
-
-var spotifyApi = new SpotifyWebApi({
-    clientId: clientId,
-    clientSecret: clientSecret
-});
-
-var spotifyToken;
-
-spotifyApi.clientCredentialsGrant().then(function (data) {
-    spotifyToken = data.body['access_token'];
-}, function (err) {
-    console.log('Something went wrong when retrieving an access token', err);
-});
-
 app.get('/', (req, res) => {
-    res.send(spotifyToken);
+    var clientId = 'b52dc91988324fd697d1f2db77378d46',
+        clientSecret = process.env.SPOTIFY_SECRET;
+
+    var spotifyApi = new SpotifyWebApi({
+        clientId: clientId,
+        clientSecret: clientSecret
+    });
+
+    spotifyApi.clientCredentialsGrant().then(function (data) {
+        var spotifyToken = data.body['access_token'];
+        res.send(spotifyToken);
+    }, function (err) {
+        console.log('Something went wrong when retrieving an access token', err);
+    });
 });
 
 app.listen(PORT, err => {
